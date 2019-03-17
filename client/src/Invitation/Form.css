@@ -1,0 +1,180 @@
+.modal{
+     position: absolute;
+     top: 40px;
+    left: 50%;
+    transform: translate(-50%, 0);
+     border: none;
+     background: none;
+     border-radius: 0px;
+    outline: none;
+    padding: 20px;
+    width: 1000px;
+}
+.card-form {
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 -2px 19px 0 rgba(0, 0, 0, 0.3), 0 13px 17px 0 rgba(0, 0, 0, 0.15);
+}
+.card-form .form-title {
+    font-family: Rochester;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    color: #576467;
+    justify-content: center;
+    height: 80px;
+    font-size: 40px;
+    font-weight: bold;
+    background: #f3eadd;
+    border-radius: 10px 10px 0 0;
+}
+.card-form .form-body {
+    padding: 10px;
+}
+.card-form .form-body .row {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+}
+
+.card-form .form-body .row.header{
+    justify-content: flex-start;
+    padding-left: 30px;
+    padding-bottom:0px;
+}
+
+.card-form .form-body .row.header h2{
+    color: #576366;
+    text-align:left;
+}
+
+.card-form .form-body .row input, .card-form .form-body .row textarea{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    margin: 0 15px;
+    height: 35px;
+    padding: 5px 15px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    background: #e8ebed;
+    color: #576366;
+    font-size: 14px;
+}
+
+.card-form .form-body .row textarea{
+    padding-top:13px;
+}
+
+.card-form .rule {
+    height: 2px;
+    background: #e8ebed;
+    margin: 0px 35px;
+}
+.card-form .form-footer {
+    margin: 0 25px 15px 25px;
+    padding: 15px 10px;
+}
+.card-form .form-footer a {
+    font-family: Rokkitt;
+    color: #5a6568;
+    background: #f3eadd;
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 15px;
+    margin-right: 10px;
+    font-size: 19px;
+    cursor:pointer;
+}
+
+.card-form .form-footer a:hover{
+    background: #eae3d8;
+}
+
+.card-form .form-footer span {
+    margin-left: 8px;
+}
+
+
+.form-checkbox
+{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    display: inline-block;
+    position: relative;
+    background-color: #f1f1f1;
+    color: #666;
+    top: 10px;
+    height: 30px;
+    width: 30px;
+    border: 0;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 7px;
+    outline: none;
+}
+.form-checkbox:checked::before
+{
+    position: absolute;
+    font: 13px/1 'Open Sans', sans-serif;
+    left: 11px;
+    top: 7px;
+    content: '\02143';
+    transform: rotate(40deg);
+}
+.form-checkbox:hover
+{
+    background-color: #f7f7f7;
+}
+.form-checkbox:checked
+{
+    background-color: #f1f1f1;
+}
+label
+{
+    font: 300 16px/1.7 'Open Sans', sans-serif;
+    color: #666;
+    cursor: pointer;
+}
+
+.card-form .form-body .checkbox_row {
+    padding-left: 25px;
+}
+
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 736px)
+and (-webkit-min-device-pixel-ratio: 2) {
+    .modal{
+        width: 564px;
+    }
+}
+
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 736px)
+and (-webkit-min-device-pixel-ratio: 2)
+and (orientation: landscape) {
+    .modal{
+        overflow-y: auto;
+        max-height: 150vh;
+        top: 0px;
+    }
+}
+
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (-webkit-min-device-pixel-ratio: 2) {
+    .modal{
+        width: 694px;
+        left: 47%;
+    }
+
+}
