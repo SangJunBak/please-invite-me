@@ -72,7 +72,7 @@ class Admin extends Component {
 
         newGuests.forEach((user)=>{
             const hash = MD5(`hash ${user.user_first_name} ${user.user_last_name}`);
-            const url = 'https://invite-me-please.firebaseapp.com/Invitation/'+hash;
+            const url = 'https://PROJECT_NAME.firebaseapp.com/Invitation/'+hash;
             this.database.update({
                 [hash]: {
                     url: url,
