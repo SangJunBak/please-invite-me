@@ -30,7 +30,7 @@ const AddForm = (props) => {
                         <TextField
                             name="newGuests"
                             value={props.newGuests}
-                            onChange={props.handleInput}
+                            onChange={(e) => props.handleInput(e.target.value)}
                             fullWidth
                             multiline
                             rows={'10'}

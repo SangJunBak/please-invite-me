@@ -82,7 +82,10 @@ const RSVP = (props) => {
                         }
                     </div>
                     <div className="form-footer">
-                        <a onClick={props.RSVPConfirmation}>Confirm<span className="fa fa-thumbs-o-up"></span></a>
+                        <a onClick={props.RSVPConfirmation}>
+                            Confirm
+                            <span className="fa fa-thumbs-o-up"></span>
+                        </a>
                     </div>
 
                 </form>

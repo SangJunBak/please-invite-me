@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -20,6 +20,7 @@ import { lighten } from '@material-ui/core/styles/colorManipulator';
 import Fire from '../fire.js';
 import 'firebase/database';
 import SimplePopover from './SimplePopover';
+const database = Fire.database();
 
 
 function desc(a, b, orderBy) {
@@ -59,53 +60,52 @@ const rows = [
     { id: 'url', numeric: false, disablePadding: false, label: 'URL'}
 ];
 
-class EnhancedTableHead extends React.Component {
-    createSortHandler = property => event => {
-        this.props.onRequestSort(event, property);
+function EnhancedTableHead(props) {
+    const createSortHandler = property => event => {
+        props.onRequestSort(event, property);
     };
 
-    render() {
-        const { onSelectAllClick, order, orderBy, numSelected, rowCount } = this.props;
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount } = props;
 
-        return (
-            <TableHead>
-                <TableRow>
-                    <TableCell padding="checkbox">
-                        <Checkbox
-                            indeterminate={numSelected > 0 && numSelected < rowCount}
-                            checked={numSelected === rowCount}
-                            onChange={onSelectAllClick}
-                        />
-                    </TableCell>
-                    {rows.map(row => {
-                        return (
-                            <TableCell
-                                key={row.id}
-                                numeric={row.numeric}
-                                padding={row.disablePadding ? 'none' : 'default'}
-                                sortDirection={orderBy === row.id ? order : false}
+    return (
+        <TableHead>
+            <TableRow>
+                <TableCell padding="checkbox">
+                    <Checkbox
+                        indeterminate={numSelected > 0 && numSelected < rowCount}
+                        checked={numSelected === rowCount}
+                        onChange={onSelectAllClick}
+                    />
+                </TableCell>
+                {rows.map(row => {
+                    return (
+                        <TableCell
+                            key={row.id}
+                            numeric={row.numeric}
+                            padding={row.disablePadding ? 'none' : 'default'}
+                            sortDirection={orderBy === row.id ? order : false}
+                        >
+                            <Tooltip
+                                title="Sort"
+                                placement={row.numeric ? 'bottom-end' : 'bottom-start'}
+                                enterDelay={300}
                             >
-                                <Tooltip
-                                    title="Sort"
-                                    placement={row.numeric ? 'bottom-end' : 'bottom-start'}
-                                    enterDelay={300}
+                                <TableSortLabel
+                                    active={orderBy === row.id}
+                                    direction={order}
+                                    onClick={createSortHandler(row.id)}
                                 >
-                                    <TableSortLabel
-                                        active={orderBy === row.id}
-                                        direction={order}
-                                        onClick={this.createSortHandler(row.id)}
-                                    >
-                                        {row.label}
-                                    </TableSortLabel>
-                                </Tooltip>
-                            </TableCell>
-                        );
-                    }, this)}
+                                    {row.label}
+                                </TableSortLabel>
+                            </Tooltip>
+                        </TableCell>
+                    );
+                })}
+            </TableRow>
+        </TableHead>
+    );
 
-                </TableRow>
-            </TableHead>
-        );
-    }
+
 }
 
 EnhancedTableHead.propTypes = {
@@ -199,31 +199,28 @@ const styles = theme => ({
     },
 });
 
-class EnhancedTable extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            order: 'asc',
-            orderBy: 'user_name',
-            selected: [],
-            guestInvitedCount: 0,
-            data: [],
-            page: 0,
-            rowsPerPage: 10,
-            isInitialValueDone : false
-        };
+function EnhancedTable (props) {
+    const [order, setOrder] = useState('asc');
+    const [orderBy, setOrderBy] = useState('user_name');
+    const [selected, setSelected] = useState([]);
+    const [guestInvitedCount, setGuestInvitedCount] = useState(0);
+    const [data, setData] = useState([]);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [isInitialValueDone, setIsInitialValueDone] = useState(false);
+    const [counter, setCounter] = useState(0);
 
-        this.counter = 0;
-        this.database = Fire.database();
+    function createData(id, user_name, rsvp_status, user_email, user_mobile, user_dietary, guest_name, guest_status, guest_mobile, url, active){
+        return { id, user_name, rsvp_status, user_email, user_mobile, user_dietary, guest_name, guest_status, guest_mobile, url, active};
     }
 
-    componentDidMount(){
-
+    useEffect(() => {
         let boolToString = (bool) => bool ? "True" : "False";
 
-        let createListofData = (user, newData) => {
+        const createListofData = (user, newData, count) => {
             if(user.active){
-                newData.push(this.createData(
+                newData.push(createData(
+                    count,
                     user.user_first_name + ' ' + user.user_last_name,
                     boolToString(user.rsvp_status),
                     user.user_email,
@@ -238,61 +235,55 @@ class EnhancedTable extends React.Component {
             }
         };
 
-        this.database.ref('/users/').once('value', (snap)=> {
-            let newData = this.state.data.slice();
-
+        database.ref('/users/').once('value', (snap)=> {
+            let newData = data.slice();
+            let count = 0;
             snap.forEach(function(child) {
                 const user =  child.val();
-                createListofData(user, newData);
+                createListofData(user, newData, count);
+                count+=1;
             });
-            this.setState({
-                data: newData,
-                guestInvitedCount: newData.length,
-                isInitialValueDone: true
-            });
+            setData(newData);
+            setGuestInvitedCount(newData.length);
+            setIsInitialValueDone(true);
+            setCounter(count);
         });
 
-        this.database.ref('/users/').on('child_added', snap => {
-            if(this.state.isInitialValueDone){
-                let newData = this.state.data.slice();
+        database.ref('/users/').on('child_added', snap => {
+            if(isInitialValueDone){
+                let newData = data.slice();
                 const user =  snap.val();
-                createListofData(user, newData);
-                this.setState({
-                    data: newData,
-                    guestInvitedCount: newData.length
-                });
+                createListofData(user, newData, counter + 1);
+                setData(newData);
+                setGuestInvitedCount(newData.length);
+                setCounter(prevCounter => prevCounter + 1);
             }
 
         });
+    }, []);
 
+    function handleRequestSort(event, property) {
+        const newOrderBy = property;
+        let newOrder = 'desc';
+
+        if (orderBy === property && order === 'desc') {
+            newOrder = 'asc';
+        }
+        setOrder(newOrder);
+        setOrderBy(newOrderBy);
     }
 
-    createData = (user_name, rsvp_status, user_email, user_mobile, user_dietary, guest_name, guest_status, guest_mobile, url, active) => {
-        this.counter+=1;
-        return { id: this.counter, user_name, rsvp_status, user_email, user_mobile, user_dietary, guest_name, guest_status, guest_mobile, url, active};
-    };
-
-    handleRequestSort = (event, property) => {
-        const orderBy = property;
-        let order = 'desc';
-
-        if (this.state.orderBy === property && this.state.order === 'desc') {
-            order = 'asc';
-        }
-
-        this.setState({ order, orderBy });
-    };
-
-    handleSelectAllClick = event => {
+    function handleSelectAllClick(event) {
         if (event.target.checked) {
-            this.setState(state => ({ selected: state.data.map(n => n.id) }));
+            setSelected(
+                data.filter(n => !!n.active)
+            );
             return;
         }
-        this.setState({ selected: [] });
-    };
+        setSelected([]);
+    }
 
-    handleClick = (event, id) => {
-        const { selected } = this.state;
+    function handleClick(event, id) {
         const selectedIndex = selected.indexOf(id);
         let newSelected = [];
 
@@ -308,128 +299,117 @@ class EnhancedTable extends React.Component {
                 selected.slice(selectedIndex + 1),
             );
         }
+        setSelected(newSelected);
+    }
 
-        this.setState({ selected: newSelected });
-    };
+    function handleChangePage(event, page) {
+        setPage(page);
+    }
 
-    handleChangePage = (event, page) => {
-        this.setState({ page });
-    };
+    function handleChangeRowsPerPage(event) {
+        setRowsPerPage(event.target.value);
+    }
 
-    handleChangeRowsPerPage = event => {
-        this.setState({ rowsPerPage: event.target.value });
-    };
-
-    handleDeleteGuest = () => {
-
-        let newData = this.state.data.slice();
-        let guestInvitedCount = this.state.guestInvitedCount;
-        this.state.selected.forEach((id)=>{
-
-            const user = this.state.data[id-1];
+    function handleDeleteGuest() {
+        let newData = data.slice();
+        let newGuestInvitedCount = guestInvitedCount;
+        selected.forEach((id)=>{
+            const user = data[id-1];
 
             const hash = user.url.split('Invitation/').pop();
-            this.database.ref('/users/'+hash).update({
+            database.ref('/users/'+hash).update({
                 active: false
             });
 
             newData[id-1].active = false;
-            guestInvitedCount--;
+            newGuestInvitedCount--;
         });
 
-
-        this.setState({
-            data: newData,
-            guestInvitedCount: guestInvitedCount,
-            selected: []
-        });
-
-    };
-
-    isSelected = id => this.state.selected.indexOf(id) !== -1;
-
-    render() {
-        const { classes } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page, guestInvitedCount} = this.state;
-        const emptyRows = rowsPerPage - Math.min(rowsPerPage, guestInvitedCount - page * rowsPerPage);
-
-        return (
-            <Paper className={classes.root}>
-                <EnhancedTableToolbar
-                    numSelected={selected.length}
-                    onDeleteGuest = {this.handleDeleteGuest}
-                    data = {this.state.data}
-                    guestInvitedCount = {guestInvitedCount}
-                />
-                <div className={classes.tableWrapper}>
-                    <Table className={classes.table} aria-labelledby="tableTitle">
-                        <EnhancedTableHead
-                            numSelected={selected.length}
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={this.handleSelectAllClick}
-                            onRequestSort={this.handleRequestSort}
-                            rowCount={guestInvitedCount}
-                        />
-                        <TableBody>
-                            {stableSort(data, getSorting(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map(n => {
-                                    const isSelected = this.isSelected(n.id);
-                                    if(n.active){
-                                        return (
-                                            <TableRow
-                                                hover
-                                                onClick={event => this.handleClick(event, n.id)}
-                                                role="checkbox"
-                                                aria-checked={isSelected}
-                                                tabIndex={-1}
-                                                key={n.id}
-                                                selected={isSelected}
-                                            >
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox checked={isSelected} />
-                                                </TableCell>
-                                                <TableCell component="th" scope="row" padding="none">
-                                                    {n.user_name}
-                                                </TableCell>
-                                                <TableCell>{n.rsvp_status}</TableCell>
-                                                <TableCell>{n.user_email}</TableCell>
-                                                <TableCell>{n.user_mobile}</TableCell>
-                                                <TableCell>{n.user_dietary}</TableCell>
-                                                <TableCell>{n.guest_name}</TableCell>
-                                                <TableCell>{n.guest_status}</TableCell>
-                                                <TableCell>{n.guest_mobile}</TableCell>
-                                                <TableCell><a href={n.url}>{n.url}</a></TableCell>
-                                            </TableRow>
-                                        );
-                                    }
-                                })}
-                            {emptyRows > 0 && (
-                                <TableRow style={{ height: 49 * emptyRows }}>
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-                <TablePagination
-                    component="div"
-                    count={guestInvitedCount}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    backIconButtonProps={{
-                        'aria-label': 'Previous Page',
-                    }}
-                    nextIconButtonProps={{
-                        'aria-label': 'Next Page',
-                    }}
-                    onChangePage={this.handleChangePage}
-                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                />
-            </Paper>
-        );
+        setData(newData);
+        setGuestInvitedCount(newGuestInvitedCount);
+        setSelected([]);
     }
+
+    const { classes } = props;
+    const emptyRows = rowsPerPage - Math.min(rowsPerPage, guestInvitedCount - page * rowsPerPage);
+
+    return (
+        <Paper className={classes.root}>
+            <EnhancedTableToolbar
+                numSelected={selected.length}
+                onDeleteGuest = {handleDeleteGuest}
+                data = {data}
+                guestInvitedCount = {guestInvitedCount}
+            />
+            <div className={classes.tableWrapper}>
+                <Table className={classes.table} aria-labelledby="tableTitle">
+                    <EnhancedTableHead
+                        numSelected={selected.length}
+                        order={order}
+                        orderBy={orderBy}
+                        onSelectAllClick={handleSelectAllClick}
+                        onRequestSort={handleRequestSort}
+                        rowCount={guestInvitedCount}
+                    />
+                    <TableBody>
+                        {stableSort(data, getSorting(order, orderBy))
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map(n => {
+                                const isSelected = (selected.indexOf(n.id) !== -1);
+                                if(n.active){
+                                    return (
+                                        <TableRow
+                                            hover
+                                            onClick={event => handleClick(event, n.id)}
+                                            role="checkbox"
+                                            aria-checked={isSelected}
+                                            tabIndex={-1}
+                                            key={n.id}
+                                            selected={isSelected}
+                                        >
+                                            <TableCell padding="checkbox">
+                                                <Checkbox checked={isSelected} />
+                                            </TableCell>
+                                            <TableCell component="th" scope="row" padding="none">
+                                                {n.user_name}
+                                            </TableCell>
+                                            <TableCell>{n.rsvp_status}</TableCell>
+                                            <TableCell>{n.user_email}</TableCell>
+                                            <TableCell>{n.user_mobile}</TableCell>
+                                            <TableCell>{n.user_dietary}</TableCell>
+                                            <TableCell>{n.guest_name}</TableCell>
+                                            <TableCell>{n.guest_status}</TableCell>
+                                            <TableCell>{n.guest_mobile}</TableCell>
+                                            <TableCell><a href={n.url}>{n.url}</a></TableCell>
+                                        </TableRow>
+                                    );
+                                }
+                            })}
+                        {emptyRows > 0 && (
+                            <TableRow style={{ height: 49 * emptyRows }}>
+                                <TableCell colSpan={6} />
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+            <TablePagination
+                component="div"
+                count={guestInvitedCount}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                backIconButtonProps={{
+                    'aria-label': 'Previous Page',
+                }}
+                nextIconButtonProps={{
+                    'aria-label': 'Next Page',
+                }}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
+        </Paper>
+    );
+
 }
 
 EnhancedTable.propTypes = {

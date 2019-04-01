@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import Envelope from './Envelope';
 import Letter from './Letter';
 import Details from './Details';
@@ -6,135 +6,121 @@ import Fire from '../fire.js';
 import 'firebase/database';
 import './Invitation.css'
 
-class Invitation extends Component {
+const database = Fire.database();
 
-    constructor(props){
-        super(props);
-        this.state = {
-            guest_first_name: "",
-            guest_last_name: "",
-            guest_mobile: "",
-            guest_status: false,
-            rsvp_status: false,
-            user_email: "",
-            user_first_name: "",
-            user_last_name: "",
-            user_mobile: "",
-            user_stage: "",
-            user_dietary: "",
-            url: "",
-            Envelopes: [],
-            Letters: [],
-            Details: [],
-            hash: this.props.location.pathname.split('Invitation').pop()
-        };
+function Invitation (props) {
+    const [input, changeInput] = useState({
+        guest_first_name: "",
+        guest_last_name: "",
+        guest_mobile: "",
+        guest_status: false,
+        rsvp_status: false,
+        user_email: "",
+        user_first_name: "",
+        user_last_name: "",
+        user_mobile: "",
+        user_stage: "",
+        user_dietary: "",
+        url: "",
+        Envelopes: [],
+        Letters: [],
+        Details: [],
+        hash: props.location.pathname.split('Invitation').pop()
+    });
+    useEffect(
+        () => {
+            const {hash} = input;
 
-        this.database = Fire.database();
-    }
+            database.ref('/users/'+hash+'/active').on('value', (isActive) => {
+                if(isActive.val()){
+                    database.ref('/users/'+hash).on('child_added', snap => {
 
-    componentDidMount(){
-        const {hash} = this.state;
+                        if(snap.key === "user_stage"){
+                            const new_user_stage = snap.val()+'s';
+                            changeInput({...input, [new_user_stage]: [""]})
 
-        this.database.ref('/users/'+hash+'/active').on('value', (isActive) => {
-            if(isActive.val()){
-                this.database.ref('/users/'+hash).on('child_added', snap => {
-
-                    if(snap.key === "user_stage"){
-                        const new_user_stage = snap.val()+'s';
-                        this.setState({
-                            [new_user_stage]: [""]
-                        });
-                    }
-                    this.setState({
-                        [snap.key]: snap.val()
+                        }
+                        changeInput({...input, [snap.key]: snap.val()})
                     });
-                });
-            }
-        });
+                }
+            });
+        }, []
+    );
 
-    }
+    useEffect(() => {
+        setTimeout( () => {
+            changeInput({
+                ...input,
+                user_stage: 'Letter',
+                Letters: ['']
+            });
+        }, 500);
+    }, [input.Envelopes]);
 
-    handleInputChange = (e) => {
+    useEffect(() => {
+        setTimeout( () => {
+            changeInput({
+                ...input,
+                user_stage: 'Details',
+                rsvp_status: true,
+                Details: ['']
+            });
+            database.ref('/users/'+input.hash).update({
+                user_stage: "Detail",
+                guest_mobile: input.guest_mobile,
+                guest_status: input.guest_status,
+                user_email: input.user_email,
+                user_dietary: input.user_dietary,
+                user_mobile: input.user_mobile,
+                rsvp_status: true
+            });
+
+        }, 500);
+    }, [input.Letters]);
+
+    function handleInputChange(e) {
         const target = e.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
 
-        this.setState({
-            [name]: value
-        });
-    };
-    
-    envelopeToInvitation = () => {
+        changeInput({...input, [name]: value})
 
-        this.setState({
-            Envelopes: [],
-        }, ()=>{
-            const new_user_stage = "Letter";
-            setTimeout( () => {
-                this.setState({
-                    user_stage: new_user_stage,
-                    Letters: [""]
-                });
-                // this.database.ref('/users/'+this.state.hash).update({
-                //     user_stage: new_user_stage
-                // });
-            }, 500);
-        });
-    };
-
-    invitationToDetails = () => {
-
-        this.setState({
-            Letters: [],
-        }, ()=>{
-            setTimeout( () => {
-                this.setState({
-                    user_stage: "Details",
-                    rsvp_status: true,
-                    Details: [""]
-                });
-                this.database.ref('/users/'+this.state.hash).update({
-                    user_stage: "Detail",
-                    guest_mobile: this.state.guest_mobile,
-                    guest_status: this.state.guest_status,
-                    user_email: this.state.user_email,
-                    user_dietary: this.state.user_dietary,
-                    user_mobile: this.state.user_mobile,
-                    rsvp_status: true
-                });
-
-            }, 500);
-        });
-    };
-
-    render() {
-        return (
-            <div className="Invitation">
-                <Envelope
-                    Envelopes = {this.state.Envelopes}
-                    user_first_name = {this.state.user_first_name}
-                    user_last_name = {this.state.user_last_name}
-                    guest_first_name = {this.state.guest_first_name}
-                    guest_last_name = {this.state.guest_last_name}
-                    handleStage ={this.envelopeToInvitation}
-                />
-                <Letter
-                    Letters = {this.state.Letters}
-                    guest_first_name = {this.state.guest_first_name}
-                    guest_last_name = {this.state.guest_last_name}
-                    guest_mobile = {this.state.guest_mobile}
-                    guest_status = {this.state.guest_status}
-                    user_email = {this.state.user_email}
-                    user_mobile = {this.state.user_mobile}
-                    user_dietary = {this.state.user_dietary}
-                    handleStage ={this.invitationToDetails}
-                    handleInputChange = {this.handleInputChange} />
-                <Details
-                    Details = {this.state.Details}
-                />
-            </div>
-        );
     }
+
+    function envelopeToInvitation() {
+        changeInput({...input, Envelopes: []});
+    }
+
+    function invitationToDetails() {
+        changeInput({...input, Letters: []});
+    }
+
+    return (
+        <div className="Invitation">
+            <Envelope
+                Envelopes = {input.Envelopes}
+                user_first_name = {input.user_first_name}
+                user_last_name = {input.user_last_name}
+                guest_first_name = {input.guest_first_name}
+                guest_last_name = {input.guest_last_name}
+                handleStage ={envelopeToInvitation}
+            />
+            <Letter
+                Letters = {input.Letters}
+                guest_first_name = {input.guest_first_name}
+                guest_last_name = {input.guest_last_name}
+                guest_mobile = {input.guest_mobile}
+                guest_status = {input.guest_status}
+                user_email = {input.user_email}
+                user_mobile = {input.user_mobile}
+                user_dietary = {input.user_dietary}
+                handleStage ={invitationToDetails}
+                handleInputChange = {handleInputChange} />
+            <Details
+                Details = {input.Details}
+            />
+        </div>
+    );
 }
 
 export default Invitation;

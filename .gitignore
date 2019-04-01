@@ -7,8 +7,7 @@ yarn-error.log*
 lerna-debug.log*
 
 .idea/
-
-client/build/
+ignore/
 
 client/src/fire.js
 
