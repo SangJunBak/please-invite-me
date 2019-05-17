@@ -1,5 +1,5 @@
 import React from 'react';
-import Admin from './Admin/Admin.js';
+import Admin from './components/Admin';
 
 import {Route, Switch} from 'react-router-dom'
 import Invite from "./components/Invite";

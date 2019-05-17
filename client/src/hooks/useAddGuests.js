@@ -5,7 +5,6 @@ const database = Fire.database().ref('/users/');
 
 export default function useAddGuests(newGuests) {
     newGuests.forEach((user) => {
-        // const hash = MD5(`hash ${user.user_first_name} ${user.user_last_name}`);
         const newPostRef = database.push();
         const url = 'https://invite-me-please.firebaseapp.com/Invitation/' + newPostRef.key;
 

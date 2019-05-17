@@ -25,8 +25,6 @@ const Invite = (props) => {
         rsvp_status
     } = user || {};
 
-    console.log(user);
-
     return (
         (user === null) ? null :
             <div className={styles.Invite}>
