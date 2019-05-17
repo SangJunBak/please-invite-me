@@ -1,0 +1,59 @@
+/* Smartphones (portrait) ----------- */
+@media only screen
+and (max-width : 425px) {
+    .Envelope{
+        width:83.333vw;
+        height:52.083vw;
+    }
+}
+/* Other ----------- */
+@media only screen
+and (min-width : 426px) {
+    .Envelope{
+        width: 95vh;
+        height: 60vh;
+    }
+}
+.Envelope{
+    composes: fancyFont from global;
+    background: #ffffff;
+    border:5px solid #B4BEC8;
+    position:relative;
+    border-radius:10px;
+    overflow:hidden;
+    cursor:pointer;
+}
+
+.Envelope:before{
+    border-bottom:5px solid #B4BEC8;
+    position:absolute;
+    display:block;
+    content:"";
+    top: 25%;
+    left:-6.25%;
+    width:62.5%;
+    height:2%;
+    transform:rotate(35deg);
+}
+
+.Envelope:after {
+    border-bottom: 5px solid #B4BEC8;
+    position: absolute;
+    display: block;
+    content: "";
+    top: 25%;
+    right: -6.25%;
+    width: 62.5%;
+    height: 2%;
+    transform: rotate(-35deg);
+}
+
+.Envelope h5 {
+    margin: 0;
+    bottom: 2%;
+    left: 2%;
+    font-weight: 100;
+    font-size: 3vw;
+    position: absolute;
+    color: #858c92;
+}

@@ -1,0 +1,140 @@
+/* Smartphones (portrait) ----------- */
+@media only screen
+and (max-width : 425px) {
+    .detailsContainer {
+        align-self: flex-start;
+        height: 138vw;
+        margin-top: 10%;
+    }
+    .smaller{
+        font-size: 2.5vw;
+    }
+    .small{
+        font-size: 5vw;
+    }
+    .big{
+        font-size: 9vw;
+    }
+
+}
+/* Other ----------- */
+@media only screen
+and (min-width : 426px) {
+    .detailsContainer{
+        background-color: #f4ebdd;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
+        height: 82vh;
+        width: 68vh;
+    }
+    .smaller{
+        font-size: 1.5vh;
+    }
+    .small{
+        font-size: 2vh;
+    }
+    .big{
+        font-size: 4.5vh;
+    }
+}
+
+.detailsContainer {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 82vh;
+    justify-content: space-around;
+    padding: 20px;
+    width: 68vh;
+}
+
+.detailsHeader {
+    composes: primaryFont from global;
+    composes: green from global;
+    composes: big;
+}
+
+.title{
+    composes: big;
+    composes: green from global;
+    composes: fancyFont from global;
+}
+
+.time{
+    composes: small;
+    composes: gold from global;
+    composes: primaryFont from global;
+    text-align: center;
+}
+
+.address{
+    composes: small;
+    composes: green from global;
+    composes: primaryFont from global;
+    text-align: center;
+    margin-top: 2%;
+}
+
+.flowers{
+    width:100%;
+}
+
+.details {
+    composes: smaller;
+    composes: green from global;
+    display: flex;
+    justify-content: space-between;
+}
+
+.scheduleDetails{
+    flex: 0 0 auto;
+    width: 50%;
+    text-align:right;
+}
+
+.hotelDetails{
+    flex: 0 0 auto;
+    width: 50%;
+    text-align:left;
+}
+
+.scheduleTitle {
+    composes: small;
+    composes: gold from global;
+    composes: fancyFont from global;
+}
+
+.hotelTitle {
+    composes: small;
+    composes: gold from global;
+    composes: fancyFont from global;
+}
+
+.footer{
+    composes: smaller;
+    composes: gold from global;
+    margin-top:2%;
+    text-align:center;
+    width: 100%;
+}
+
+hr {
+    border: 0;
+    clear:both;
+    display:block;
+    width: 100%;
+    background-color: rgb(175, 195, 182);
+    height: 1px;
+}
+
+.backButton {
+    align-self: flex-start;
+    color: grey;
+    composes: fancyFont from global;
+    font-size: 2vh;
+    margin-top: -14px;
+    text-decoration: none;
+}
+
+.backButton:hover {
+    color: #54755f
+}

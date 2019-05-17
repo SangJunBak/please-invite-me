@@ -1,22 +1,10 @@
-.modal{
-     position: absolute;
-     top: 40px;
-    left: 50%;
-    transform: translate(-50%, 0);
-     border: none;
-     background: none;
-     border-radius: 0px;
-    outline: none;
-    padding: 20px;
-    width: 1000px;
-}
-.card-form {
+.cardForm {
     border-radius: 10px;
     background: white;
     box-shadow: 0 -2px 19px 0 rgba(0, 0, 0, 0.3), 0 13px 17px 0 rgba(0, 0, 0, 0.15);
 }
-.card-form .form-title {
-    font-family: Rochester;
+.formTitle {
+    composes: fancyFont from global;
     width: 100%;
     display: flex;
     align-items: center;
@@ -28,29 +16,28 @@
     background: #f3eadd;
     border-radius: 10px 10px 0 0;
 }
-.card-form .form-body {
+.formBody {
     padding: 10px;
 }
-.card-form .form-body .row {
+.row {
     display: flex;
     justify-content: space-around;
     padding: 10px;
 }
 
-.card-form .form-body .row.header{
+.header{
+    composes: row;
     justify-content: flex-start;
     padding-left: 30px;
-    padding-bottom:0px;
+    padding-bottom:0;
 }
 
-.card-form .form-body .row.header h2{
+.header h2{
     color: #576366;
     text-align:left;
 }
 
-.card-form .form-body .row input, .card-form .form-body .row textarea{
-    -webkit-appearance: none;
-    -moz-appearance: none;
+.textInput, .textAreaInput{
     appearance: none;
     width: 100%;
     margin: 0 15px;
@@ -64,21 +51,26 @@
     font-size: 14px;
 }
 
-.card-form .form-body .row textarea{
+.textAreaInput{
     padding-top:13px;
 }
 
-.card-form .rule {
+.rule {
     height: 2px;
     background: #e8ebed;
     margin: 0px 35px;
 }
-.card-form .form-footer {
+.formFooter {
     margin: 0 25px 15px 25px;
     padding: 15px 10px;
 }
-.card-form .form-footer a {
-    font-family: Rokkitt;
+
+.formFooter span {
+    margin-left: 8px;
+}
+
+.confirmButton {
+    composes: primaryFont from global;
     color: #5a6568;
     background: #f3eadd;
     display: inline-block;
@@ -91,20 +83,11 @@
     font-size: 19px;
     cursor:pointer;
 }
-
-.card-form .form-footer a:hover{
+.confirmButton:hover{
     background: #eae3d8;
 }
 
-.card-form .form-footer span {
-    margin-left: 8px;
-}
-
-
-.form-checkbox
-{
-    -webkit-appearance: none;
-    -moz-appearance: none;
+.formCheckbox {
     appearance: none;
     display: inline-block;
     position: relative;
@@ -119,8 +102,7 @@
     margin-right: 7px;
     outline: none;
 }
-.form-checkbox:checked::before
-{
+.formCheckbox:checked::before {
     position: absolute;
     font: 13px/1 'Open Sans', sans-serif;
     left: 11px;
@@ -128,53 +110,18 @@
     content: '\02143';
     transform: rotate(40deg);
 }
-.form-checkbox:hover
-{
+.formCheckbox:hover {
     background-color: #f7f7f7;
 }
-.form-checkbox:checked
-{
+.formCheckbox:checked {
     background-color: #f1f1f1;
 }
-label
-{
+.checkboxRow label {
     font: 300 16px/1.7 'Open Sans', sans-serif;
     color: #666;
     cursor: pointer;
 }
 
-.card-form .form-body .checkbox_row {
+.checkboxRow {
     padding-left: 25px;
-}
-
-@media only screen
-and (min-device-width: 320px)
-and (max-device-width: 736px)
-and (-webkit-min-device-pixel-ratio: 2) {
-    .modal{
-        width: 564px;
-    }
-}
-
-@media only screen
-and (min-device-width: 320px)
-and (max-device-width: 736px)
-and (-webkit-min-device-pixel-ratio: 2)
-and (orientation: landscape) {
-    .modal{
-        overflow-y: auto;
-        max-height: 150vh;
-        top: 0px;
-    }
-}
-
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (-webkit-min-device-pixel-ratio: 2) {
-    .modal{
-        width: 694px;
-        left: 47%;
-    }
-
 }

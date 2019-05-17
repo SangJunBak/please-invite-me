@@ -316,7 +316,7 @@ function EnhancedTable (props) {
         selected.forEach((id)=>{
             const user = data[id-1];
 
-            const hash = user.url.split('Invitation/').pop();
+            const hash = user.url.split('InvitationRoute/').pop();
             database.ref('/users/'+hash).update({
                 active: false
             });
